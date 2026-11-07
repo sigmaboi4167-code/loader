@@ -12815,9 +12815,14 @@ header.InputBegan:Connect(function(event)
     drag, origin, initial = event, event.Position, panel.AbsolutePosition + panel.AbsoluteSize / 2
 end)
 local motion = Input.InputChanged:Connect(function(event)
-    if not drag or (event ~= drag and (drag.UserInputType ~= Enum.UserInputType.MouseButton1
-        or (event.UserInputType ~= Enum.UserInputType.MouseMovement
-            and event.UserInputType ~= Enum.UserInputType.Touch))) then return end
+    if not drag then return end
+    if drag.UserInputType == Enum.UserInputType.MouseButton1 then
+        if event.UserInputType ~= Enum.UserInputType.MouseMovement then return end
+    elseif drag.UserInputType == Enum.UserInputType.Touch then
+        if event ~= drag and event.UserInputType ~= Enum.UserInputType.Touch then return end
+    else
+        return
+    end
     local shift = event.Position - origin
     local view, half = camera.ViewportSize, panel.AbsoluteSize / 2
     panel.Position = UDim2.fromOffset(math.clamp(initial.X + shift.X, half.X, math.max(half.X, view.X - half.X)),
